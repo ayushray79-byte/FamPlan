@@ -1,0 +1,284 @@
+// Data Structure
+let famPlanData = {
+    children: {},
+    tasks: [],
+    badges: [
+        { id: 1, name: "First Steps", icon: "👣", points: 10 },
+        { id: 2, name: "Week Warrior", icon: "⚔️", points: 50 },
+        { id: 3, name: "Month Master", icon: "👑", points: 200 },
+        { id: 4, name: "Century Club", icon: "💯", points: 1000 }
+    ]
+};
+
+// Default Tasks
+const defaultTasks = [
+    { id: 1, name: "Clean Room", type: "chore", points: 5 },
+    { id: 2, name: "Math Homework", type: "learning", points: 10 },
+    { id: 3, name: "Do Laundry", type: "chore", points: 8 },
+    { id: 4, name: "Read for 30 mins", type: "learning", points: 7 },
+    { id: 5, name: "Wash Dishes", type: "chore", points: 5 },
+    { id: 6, name: "Science Project", type: "learning", points: 15 }
+];
+
+// Initialize on page load
+window.addEventListener('DOMContentLoaded', () => {
+    loadFromLocalStorage();
+});
+
+// LocalStorage Functions
+function loadFromLocalStorage() {
+    const saved = localStorage.getItem('famPlanData');
+    if (saved) {
+        famPlanData = JSON.parse(saved);
+    } else {
+        famPlanData.tasks = [...defaultTasks];
+        saveToLocalStorage();
+    }
+}
+
+function saveToLocalStorage() {
+    localStorage.setItem('famPlanData', JSON.stringify(famPlanData));
+}
+
+// Navigation Functions
+function goHome() {
+    window.location.href = 'index.html';
+}
+
+function goToParent() {
+    window.location.href = 'parent-dashboard.html';
+}
+
+function goToChild() {
+    window.location.href = 'child-dashboard.html';
+}
+
+// Parent Dashboard Functions
+function loadParentDashboard() {
+    renderTasksList();
+    renderChildrenStats();
+}
+
+function addTask() {
+    const name = document.getElementById('taskName').value;
+    const type = document.getElementById('taskType').value;
+    const points = parseInt(document.getElementById('taskPoints').value);
+
+    if (!name) {
+        alert('Please enter a task name');
+        return;
+    }
+
+    const newTask = {
+        id: Date.now(),
+        name: name,
+        type: type,
+        points: points
+    };
+
+    famPlanData.tasks.push(newTask);
+    saveToLocalStorage();
+
+    // Clear form
+    document.getElementById('taskName').value = '';
+    document.getElementById('taskPoints').value = '5';
+
+    // Reload list
+    renderTasksList();
+    alert('Task added successfully!');
+}
+
+function deleteTask(taskId) {
+    if (confirm('Delete this task?')) {
+        famPlanData.tasks = famPlanData.tasks.filter(t => t.id !== taskId);
+        saveToLocalStorage();
+        renderTasksList();
+    }
+}
+
+function renderTasksList() {
+    const tasksList = document.getElementById('tasksList');
+    if (!tasksList) return;
+
+    tasksList.innerHTML = '';
+
+    famPlanData.tasks.forEach(task => {
+        const taskCard = document.createElement('div');
+        taskCard.className = 'task-card';
+        taskCard.innerHTML = `
+            <h3>${task.name}</h3>
+            <span class="task-type ${task.type}">${task.type === 'chore' ? '🧹' : '📚'} ${task.type}</span>
+            <div class="task-points">⭐ ${task.points} points</div>
+            <div class="task-actions">
+                <button class="btn-delete" onclick="deleteTask(${task.id})">Delete</button>
+            </div>
+        `;
+        tasksList.appendChild(taskCard);
+    });
+}
+
+function renderChildrenStats() {
+    const childrenStats = document.getElementById('childrenStats');
+    if (!childrenStats) return;
+
+    // For demo: show a single child profile
+    const totalPoints = getTotalPoints('child1');
+    const streak = getWeeklyStreak('child1');
+
+    childrenStats.innerHTML = `
+        <div class="child-stat">
+            <h3>👶 Child 1</h3>
+            <div class="stat-value">${totalPoints}</div>
+            <p>Total Points</p>
+            <div style="margin-top: 10px;">
+                <p>🔥 Weekly Streak: ${streak}/7</p>
+            </div>
+        </div>
+    `;
+}
+
+// Child Dashboard Functions
+function loadChildDashboard() {
+    renderChildTasks();
+    updatePointsDisplay();
+    updateStreakDisplay();
+    updateBadgesDisplay();
+}
+
+function renderChildTasks() {
+    const tasksList = document.getElementById('childTasksList');
+    if (!tasksList) return;
+
+    tasksList.innerHTML = '';
+
+    famPlanData.tasks.forEach(task => {
+        const isCompleted = isTaskCompletedToday('child1', task.id);
+        
+        const taskCard = document.createElement('div');
+        taskCard.className = 'task-card';
+        taskCard.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <input type="checkbox" class="task-checkbox" 
+                       ${isCompleted ? 'checked' : ''} 
+                       onchange="toggleTask(${task.id}, this.checked)">
+                <div style="flex: 1;">
+                    <h3>${task.name}</h3>
+                    <span class="task-type ${task.type}">${task.type === 'chore' ? '🧹' : '📚'} ${task.type}</span>
+                </div>
+            </div>
+            <div class="task-points">⭐ ${task.points} points</div>
+        `;
+        tasksList.appendChild(taskCard);
+    });
+}
+
+function toggleTask(taskId, isCompleted) {
+    if (!famPlanData.children['child1']) {
+        famPlanData.children['child1'] = { completedTasks: [], points: 0 };
+    }
+
+    const today = new Date().toISOString().split('T')[0];
+    const taskKey = `${taskId}-${today}`;
+
+    if (isCompleted) {
+        if (!famPlanData.children['child1'].completedTasks.includes(taskKey)) {
+            famPlanData.children['child1'].completedTasks.push(taskKey);
+            
+            // Add points
+            const task = famPlanData.tasks.find(t => t.id === taskId);
+            famPlanData.children['child1'].points += task.points;
+        }
+    } else {
+        famPlanData.children['child1'].completedTasks = 
+            famPlanData.children['child1'].completedTasks.filter(t => t !== taskKey);
+        
+        // Remove points
+        const task = famPlanData.tasks.find(t => t.id === taskId);
+        famPlanData.children['child1'].points -= task.points;
+    }
+
+    saveToLocalStorage();
+    updatePointsDisplay();
+    updateStreakDisplay();
+    updateBadgesDisplay();
+}
+
+function updatePointsDisplay() {
+    const totalPoints = getTotalPoints('child1');
+    const pointsElement = document.getElementById('totalPoints');
+    if (pointsElement) {
+        pointsElement.textContent = totalPoints;
+    }
+}
+
+function updateStreakDisplay() {
+    const streak = getWeeklyStreak('child1');
+    const streakFill = document.getElementById('streakFill');
+    const streakText = document.getElementById('streakText');
+    
+    if (streakFill) {
+        streakFill.style.width = (streak * 14.28) + '%';
+    }
+    if (streakText) {
+        streakText.textContent = `${streak}/7 tasks completed this week`;
+    }
+}
+
+function updateBadgesDisplay() {
+    const badgesContainer = document.getElementById('badgesContainer');
+    if (!badgesContainer) return;
+
+    badgesContainer.innerHTML = '';
+    const totalPoints = getTotalPoints('child1');
+
+    famPlanData.badges.forEach(badge => {
+        const isUnlocked = totalPoints >= badge.points;
+        const badgeDiv = document.createElement('div');
+        badgeDiv.className = `badge ${!isUnlocked ? 'badge-locked' : ''}`;
+        badgeDiv.innerHTML = `
+            <div class="badge-icon">${badge.icon}</div>
+            <div class="badge-name">${badge.name}</div>
+            <div style="font-size: 0.8em; color: #666;">${badge.points} pts</div>
+        `;
+        badgesContainer.appendChild(badgeDiv);
+    });
+}
+
+// Utility Functions
+function getTotalPoints(childId) {
+    if (!famPlanData.children[childId]) return 0;
+    return famPlanData.children[childId].points || 0;
+}
+
+function getWeeklyStreak(childId) {
+    if (!famPlanData.children[childId]) return 0;
+
+    const today = new Date();
+    let streak = 0;
+
+    for (let i = 0; i < 7; i++) {
+        const date = new Date(today);
+        date.setDate(date.getDate() - i);
+        const dateStr = date.toISOString().split('T')[0];
+        
+        const tasksForDay = famPlanData.children[childId].completedTasks
+            .filter(t => t.endsWith(dateStr));
+        
+        if (tasksForDay.length > 0) {
+            streak++;
+        } else {
+            break;
+        }
+    }
+
+    return streak;
+}
+
+function isTaskCompletedToday(childId, taskId) {
+    if (!famPlanData.children[childId]) return false;
+    
+    const today = new Date().toISOString().split('T')[0];
+    const taskKey = `${taskId}-${today}`;
+    
+    return famPlanData.children[childId].completedTasks.includes(taskKey);
+}
