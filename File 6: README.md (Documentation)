@@ -1,0 +1,34 @@
+# 🏠 FamPlan - Family Task Manager
+
+A fun and interactive website for families to manage household chores and learning tasks with a gamification system featuring points, streaks, and badges!
+
+## ✨ Features
+
+### 👨‍👩‍👧‍👦 Parent Dashboard
+- ➕ Add custom tasks
+- 🧹 Categorize tasks (Chores vs Learning)
+- ⭐ Assign points to tasks
+- 📊 Monitor children's progress
+
+### 👶 Child Dashboard
+- 📝 View today's tasks
+- ✅ Check off completed tasks
+- 💰 Earn points for completed tasks
+- 🔥 Track weekly streaks
+- 🏅 Unlock badges
+
+### 🎮 Gamification Features
+- **Points System**: Each task awards points
+- **Weekly Streaks**: Track consecutive days of task completion
+- **Badges**: Unlock achievements based on total points
+  - 👣 First Steps (10 points)
+  - ⚔️ Week Warrior (50 points)
+  - 👑 Month Master (200 points)
+  - 💯 Century Club (1000 points)
+
+## 🚀 Quick Start
+
+### 1. Clone or Download
+```bash
+git clone https://github.com/ayushray79-byte/FamPlan.git
+cd FamPlan
