@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Child Dashboard - FamPlan</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="dashboard child-dashboard">
+        <header>
+            <h1>👶 My Tasks</h1>
+            <button class="btn-back" onclick="goHome()">← Home</button>
+        </header>
+
+        <main>
+            <!-- Points Display -->
+            <section class="points-display">
+                <div class="points-card">
+                    <h2>💰 Total Points</h2>
+                    <p class="points-value" id="totalPoints">0</p>
+                </div>
+            </section>
+
+            <!-- Streak Display -->
+            <section class="streak-display">
+                <div class="streak-card">
+                    <h2>🔥 Weekly Streak</h2>
+                    <div class="streak-bar" id="streakBar">
+                        <div class="streak-fill" id="streakFill"></div>
+                    </div>
+                    <p id="streakText">0/7 tasks completed this week</p>
+                </div>
+            </section>
+
+            <!-- Badges -->
+            <section class="badges-section">
+                <h2>🏅 Badges</h2>
+                <div class="badges-container" id="badgesContainer"></div>
+            </section>
+
+            <!-- Today's Tasks -->
+            <section class="tasks-section">
+                <h2>📝 Today's Tasks</h2>
+                <div id="childTasksList" class="tasks-list"></div>
+            </section>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Load child dashboard on page load
+        loadChildDashboard();
+    </script>
+</body>
+</html>
