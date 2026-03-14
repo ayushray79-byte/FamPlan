@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parent Dashboard - FamPlan</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="dashboard parent-dashboard">
+        <header>
+            <h1>👨‍👩‍👧‍👦 Parent Dashboard</h1>
+            <button class="btn-back" onclick="goHome()">← Home</button>
+        </header>
+
+        <main>
+            <!-- Add New Task Section -->
+            <section class="add-task-section">
+                <h2>➕ Add Custom Task</h2>
+                <div class="form-group">
+                    <input type="text" id="taskName" placeholder="Task name (e.g., Clean room)">
+                    <select id="taskType">
+                        <option value="chore">🧹 Chore</option>
+                        <option value="learning">📚 Learning</option>
+                    </select>
+                    <input type="number" id="taskPoints" placeholder="Points" value="5" min="1" max="100">
+                    <button class="btn btn-add" onclick="addTask()">Add Task</button>
+                </div>
+            </section>
+
+            <!-- Tasks Management -->
+            <section class="tasks-management">
+                <h2>📋 Manage Tasks</h2>
+                <div id="tasksList" class="tasks-list"></div>
+            </section>
+
+            <!-- Child Points Overview -->
+            <section class="points-overview">
+                <h2>🏆 Children's Progress</h2>
+                <div id="childrenStats" class="children-stats"></div>
+            </section>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Load parent dashboard on page load
+        loadParentDashboard();
+    </script>
+</body>
+</html>
