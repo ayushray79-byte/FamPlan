@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FamPlan - Family Task Manager</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="landing-page">
+        <div class="container">
+            <h1>🏠 FamPlan</h1>
+            <p>Make family chores fun with points, streaks, and badges!</p>
+            
+            <div class="role-selection">
+                <button class="btn btn-parent" onclick="goToParent()">
+                    👨‍👩‍👧‍👦 Parent Dashboard
+                </button>
+                <button class="btn btn-child" onclick="goToChild()">
+                    👶 Child Dashboard
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
