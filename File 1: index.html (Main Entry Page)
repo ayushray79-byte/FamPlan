@@ -1,28 +1,1384 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FamPlan - Family Task Manager</title>
-    <link rel="stylesheet" href="styles.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FamPlan – Making Chores Fun & Rewarding!</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sky: #5bb8f5;
+    --sky-dark: #3a9de0;
+    --sun: #ffd84d;
+    --gold: #f5a623;
+    --green: #4cca6b;
+    --green-dark: #35a855;
+    --red: #f05a5a;
+    --red-dark: #d43f3f;
+    --wood: #c8905a;
+    --wood-light: #e8b88a;
+    --cream: #fef9ec;
+    --card-bg: #fffdf4;
+    --border: #e8d5a0;
+    --text: #4a3520;
+    --text-light: #8a6e50;
+    --purple: #9b6cf7;
+    --coin: #fdc941;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: linear-gradient(180deg, #b8e4ff 0%, #ddf0ff 40%, #e8f8e0 100%);
+    min-height: 100vh;
+    color: var(--text);
+    overflow-x: hidden;
+  }
+
+  /* Clouds */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 120px 60px at 10% 15%, rgba(255,255,255,0.7) 60%, transparent 70%),
+      radial-gradient(ellipse 80px 40px at 13% 12%, rgba(255,255,255,0.7) 60%, transparent 70%),
+      radial-gradient(ellipse 100px 50px at 70% 8%, rgba(255,255,255,0.6) 60%, transparent 70%),
+      radial-gradient(ellipse 60px 30px at 73% 5%, rgba(255,255,255,0.6) 60%, transparent 70%),
+      radial-gradient(ellipse 90px 45px at 88% 18%, rgba(255,255,255,0.5) 60%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ===== TOP NAV ===== */
+  .topbar {
+    background: linear-gradient(180deg, var(--sky-dark) 0%, var(--sky) 100%);
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 3px 0 rgba(0,0,0,0.2);
+    position: relative;
+    z-index: 10;
+    border-bottom: 3px solid rgba(0,0,0,0.15);
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+  }
+
+  .logo-icon {
+    width: 40px;
+    height: 40px;
+    background: #fff;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2), inset 0 1px 2px rgba(255,255,255,0.8);
+    border: 2px solid rgba(0,0,0,0.1);
+  }
+
+  .logo-text {
+    font-family: 'Fredoka One', cursive;
+    font-size: 26px;
+    line-height: 1;
+    text-shadow: 2px 2px 0 rgba(0,0,0,0.2);
+  }
+
+  .logo-text .fam { color: #fff; }
+  .logo-text .plan { color: var(--sun); }
+
+  .topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .user-badge {
+    background: rgba(0,0,0,0.2);
+    border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 20px;
+    padding: 5px 12px 5px 5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #fff;
+    font-weight: 700;
+    font-size: 14px;
+  }
+
+  .user-avatar {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px;
+    background: var(--sun);
+  }
+
+  .xp-badge {
+    background: var(--sun);
+    color: var(--text);
+    border-radius: 20px;
+    padding: 5px 12px 5px 8px;
+    font-weight: 800;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    border: 2px solid var(--gold);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  }
+
+  /* ===== NAV TABS ===== */
+  .navtabs {
+    background: rgba(0,0,0,0.15);
+    padding: 8px 20px 0;
+    display: flex;
+    gap: 4px;
+    position: relative;
+    z-index: 9;
+  }
+
+  .tab {
+    padding: 8px 18px;
+    border-radius: 10px 10px 0 0;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    color: rgba(255,255,255,0.8);
+    border: none;
+    background: rgba(255,255,255,0.15);
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .tab:hover { background: rgba(255,255,255,0.25); color: #fff; }
+
+  .tab.active {
+    background: var(--cream);
+    color: var(--text);
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
+  }
+
+  /* ===== ROLE TOGGLE ===== */
+  .role-toggle {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-end;
+  }
+
+  .role-btn {
+    padding: 10px 18px;
+    border-radius: 20px;
+    border: none;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 13px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    transition: all 0.15s;
+  }
+
+  .role-btn:hover { transform: scale(1.05); }
+  .role-btn.parent-btn { background: var(--sky); color: #fff; }
+  .role-btn.child-btn { background: var(--green); color: #fff; }
+  .role-btn.active-role { outline: 3px solid #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+
+  /* ===== MAIN CONTENT ===== */
+  main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 24px 16px 80px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* ===== PAGE HEADING ===== */
+  .page-title {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+
+  .page-title h1 {
+    font-family: 'Fredoka One', cursive;
+    font-size: 36px;
+    color: var(--sky-dark);
+    text-shadow: 2px 2px 0 rgba(255,255,255,0.8);
+  }
+
+  .page-title p {
+    font-size: 15px;
+    color: var(--wood);
+    font-weight: 700;
+    margin-top: 4px;
+  }
+
+  /* ===== WOOD CARD ===== */
+  .wood-card {
+    background: var(--card-bg);
+    border: 3px solid var(--border);
+    border-radius: 16px;
+    padding: 18px;
+    box-shadow: 0 4px 0 rgba(0,0,0,0.1);
+  }
+
+  .card-title {
+    font-family: 'Fredoka One', cursive;
+    font-size: 16px;
+    color: var(--wood);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* ===== CHORE MANAGE VIEW ===== */
+  .manage-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  @media (max-width: 600px) { .manage-grid { grid-template-columns: 1fr; } }
+
+  .task-library-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .library-item {
+    background: linear-gradient(135deg, #fff8e8, #fff3d0);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 10px 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .library-item:hover {
+    border-color: var(--gold);
+    transform: scale(1.04);
+    box-shadow: 0 3px 8px rgba(245,166,35,0.3);
+  }
+
+  .library-item .icon { font-size: 24px; display: block; margin-bottom: 4px; }
+
+  .quick-add-btn {
+    background: linear-gradient(135deg, var(--sky), var(--sky-dark));
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 9px 16px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 0 rgba(0,0,0,0.15);
+    transition: all 0.1s;
+  }
+
+  .quick-add-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+
+  /* ===== FORM ===== */
+  .form-group { margin-bottom: 12px; }
+  .form-group label { font-size: 13px; font-weight: 700; color: var(--text-light); display: block; margin-bottom: 5px; }
+
+  .form-group input, .form-group textarea, .form-group select {
+    width: 100%;
+    padding: 9px 12px;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px;
+    background: #fff;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .form-group input:focus, .form-group textarea:focus { border-color: var(--sky); }
+  .form-group textarea { resize: vertical; min-height: 60px; }
+
+  .reward-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+
+  .reward-chip {
+    background: linear-gradient(135deg, #fff8e0, #ffedaa);
+    border: 2px solid var(--gold);
+    border-radius: 20px;
+    padding: 5px 12px;
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .assign-avatars {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+
+  .child-avatar-btn {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    border: 3px solid var(--border);
+    font-size: 18px;
+    background: #fff;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .child-avatar-btn.selected {
+    border-color: var(--green);
+    box-shadow: 0 0 0 3px rgba(76,202,107,0.3);
+    transform: scale(1.1);
+  }
+
+  .btn-green {
+    background: linear-gradient(180deg, var(--green), var(--green-dark));
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 12px 20px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 15px;
+    cursor: pointer;
+    width: 100%;
+    box-shadow: 0 3px 0 rgba(0,0,0,0.2);
+    transition: all 0.1s;
+  }
+
+  .btn-green:hover { transform: translateY(-1px); box-shadow: 0 5px 10px rgba(0,0,0,0.2); }
+  .btn-green:active { transform: translateY(1px); box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+
+  /* ===== TODAY TASKS LIST ===== */
+  .task-list-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    background: #fff;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .task-check {
+    width: 20px; height: 20px;
+    border-radius: 6px;
+    background: var(--green);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff;
+    font-size: 12px;
+    flex-shrink: 0;
+  }
+
+  .task-xp {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+    color: var(--gold);
+    font-weight: 800;
+  }
+
+  /* ===== CHILD TASK CARDS ===== */
+  .task-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 16px;
+    margin: 20px 0;
+  }
+
+  .task-card {
+    background: var(--card-bg);
+    border: 3px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 0 rgba(0,0,0,0.1);
+    transition: transform 0.15s;
+  }
+
+  .task-card:hover { transform: translateY(-2px); }
+
+  .task-card-img {
+    height: 130px;
+    background: linear-gradient(135deg, #c8e6ff, #a0d4f5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 56px;
+    position: relative;
+  }
+
+  .task-card-img .star-badge {
+    position: absolute;
+    top: 8px; left: 8px;
+    background: var(--sun);
+    border-radius: 6px;
+    padding: 2px 8px;
+    font-size: 12px;
+    font-weight: 900;
+    color: var(--text);
+    border: 2px solid var(--gold);
+    display: flex; align-items: center; gap: 3px;
+  }
+
+  .task-card-body {
+    padding: 10px 12px;
+  }
+
+  .task-card-name {
+    font-family: 'Fredoka One', cursive;
+    font-size: 16px;
+    margin-bottom: 8px;
+    color: var(--text);
+  }
+
+  .btn-photo {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 7px 12px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    cursor: pointer;
+    display: flex; align-items: center; gap: 5px;
+    margin-bottom: 6px;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .btn-done {
+    background: linear-gradient(180deg, var(--green), var(--green-dark));
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 7px 12px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    cursor: pointer;
+    display: flex; align-items: center; gap: 5px;
+    width: 100%;
+    justify-content: center;
+    box-shadow: 0 2px 0 rgba(0,0,0,0.15);
+  }
+
+  .btn-done.completed {
+    background: linear-gradient(180deg, #8ee8a6, #6dd48c);
+    cursor: default;
+  }
+
+  /* ===== STATS BAR ===== */
+  .stats-bar {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+
+  .stat-chip {
+    background: var(--card-bg);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 2px 0 rgba(0,0,0,0.08);
+  }
+
+  .xp-progress-bar {
+    background: #e0e0e0;
+    border-radius: 20px;
+    height: 14px;
+    overflow: hidden;
+    border: 2px solid rgba(0,0,0,0.1);
+    flex: 1;
+    min-width: 120px;
+  }
+
+  .xp-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--sun), var(--gold));
+    border-radius: 20px;
+    transition: width 0.5s ease;
+  }
+
+  /* ===== COMPLETION POPUP ===== */
+  .popup-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+
+  .popup-overlay.show { opacity: 1; pointer-events: all; }
+
+  .popup {
+    background: var(--card-bg);
+    border: 4px solid var(--gold);
+    border-radius: 20px;
+    padding: 28px 32px;
+    text-align: center;
+    max-width: 340px;
+    width: 90%;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  }
+
+  @keyframes popIn {
+    from { transform: scale(0.7); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  .popup-title {
+    font-family: 'Fredoka One', cursive;
+    font-size: 28px;
+    color: var(--sky-dark);
+    margin-bottom: 6px;
+  }
+
+  .popup-rewards {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin: 14px 0;
+  }
+
+  .popup-reward-item {
+    background: linear-gradient(135deg, #fff8e0, #ffedaa);
+    border: 2px solid var(--gold);
+    border-radius: 12px;
+    padding: 10px 18px;
+    font-weight: 900;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .popup-btns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 14px;
+  }
+
+  .btn-collect {
+    background: linear-gradient(180deg, #ff8c42, #e5631e);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 11px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 14px;
+    cursor: pointer;
+    box-shadow: 0 3px 0 rgba(0,0,0,0.2);
+  }
+
+  .btn-next {
+    background: linear-gradient(180deg, var(--sky), var(--sky-dark));
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 11px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 14px;
+    cursor: pointer;
+    box-shadow: 0 3px 0 rgba(0,0,0,0.2);
+  }
+
+  /* ===== REWARDS VIEW ===== */
+  .rewards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  .reward-card {
+    background: var(--card-bg);
+    border: 3px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 0 rgba(0,0,0,0.1);
+    position: relative;
+  }
+
+  .reward-card.unlocked { border-color: var(--green); }
+  .reward-card.locked { opacity: 0.7; }
+
+  .reward-card-cost {
+    position: absolute;
+    top: 10px; left: 10px;
+    background: var(--sun);
+    border: 2px solid var(--gold);
+    border-radius: 8px;
+    padding: 3px 10px;
+    font-weight: 900;
+    font-size: 14px;
+    color: var(--text);
+    display: flex; align-items: center; gap: 4px;
+  }
+
+  .reward-card-img {
+    height: 120px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 52px;
+    background: linear-gradient(135deg, #fff3c8, #ffe680);
+  }
+
+  .reward-card-body {
+    padding: 10px 12px;
+  }
+
+  .reward-card-name {
+    font-family: 'Fredoka One', cursive;
+    font-size: 16px;
+    margin-bottom: 4px;
+  }
+
+  .reward-card-desc {
+    font-size: 12px;
+    color: var(--text-light);
+    margin-bottom: 8px;
+  }
+
+  .ultimate-banner {
+    background: linear-gradient(135deg, #fff3c8, #ffd84d);
+    border: 3px solid var(--gold);
+    border-radius: 16px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 8px;
+  }
+
+  .ultimate-banner .icon { font-size: 40px; }
+
+  .ultimate-banner h3 {
+    font-family: 'Fredoka One', cursive;
+    font-size: 20px;
+    color: var(--text);
+  }
+
+  .ultimate-banner p {
+    font-size: 14px;
+    color: var(--text-light);
+  }
+
+  /* ===== LEADERBOARD ===== */
+  .leaderboard-list {
+    list-style: none;
+  }
+
+  .lb-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 16px;
+    background: var(--card-bg);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 0 rgba(0,0,0,0.07);
+  }
+
+  .lb-rank {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 900;
+    font-size: 15px;
+    flex-shrink: 0;
+  }
+
+  .lb-rank.gold { background: var(--sun); color: var(--text); border: 2px solid var(--gold); }
+  .lb-rank.silver { background: #d8d8d8; color: #555; border: 2px solid #aaa; }
+  .lb-rank.bronze { background: #e8b68a; color: #5a3010; border: 2px solid var(--wood); }
+
+  .lb-avatar { font-size: 24px; }
+
+  .lb-name { font-weight: 800; font-size: 15px; }
+  .lb-level { font-size: 12px; color: var(--text-light); font-weight: 700; }
+
+  .lb-score {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: 900;
+    font-size: 16px;
+    color: var(--gold);
+  }
+
+  /* ===== REVIEW CARD ===== */
+  .review-card {
+    background: var(--card-bg);
+    border: 3px solid var(--border);
+    border-radius: 16px;
+    padding: 18px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 0 rgba(0,0,0,0.1);
+  }
+
+  .review-card h3 {
+    font-family: 'Fredoka One', cursive;
+    font-size: 17px;
+    margin-bottom: 4px;
+  }
+
+  .badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; }
+  .badge-orange { background: #fff3e0; color: #e65c00; border: 1px solid #ffb74d; }
+  .badge-blue { background: #e3f2fd; color: #1565c0; border: 1px solid #90caf9; }
+
+  .review-photo {
+    width: 100%;
+    height: 140px;
+    background: linear-gradient(135deg, #c8e6ff, #9cc8ef);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    margin: 10px 0;
+  }
+
+  .review-btns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 12px;
+  }
+
+  .btn-approve {
+    background: linear-gradient(180deg, var(--green), var(--green-dark));
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 11px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 14px;
+    cursor: pointer;
+    box-shadow: 0 3px 0 rgba(0,0,0,0.2);
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+
+  .btn-cancel {
+    background: linear-gradient(180deg, var(--red), var(--red-dark));
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 11px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 14px;
+    cursor: pointer;
+    box-shadow: 0 3px 0 rgba(0,0,0,0.2);
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+
+  /* ===== WELCOME HERO ===== */
+  .hero {
+    text-align: center;
+    padding: 30px 0 20px;
+  }
+
+  .hero h1 {
+    font-family: 'Fredoka One', cursive;
+    font-size: 48px;
+    color: var(--sky-dark);
+    text-shadow: 3px 3px 0 rgba(255,255,255,0.9);
+    margin-bottom: 6px;
+  }
+
+  .hero p {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--wood);
+    margin-bottom: 20px;
+  }
+
+  .hero-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    max-width: 640px;
+    margin: 0 auto 24px;
+  }
+
+  .hero-card {
+    background: var(--card-bg);
+    border: 3px solid var(--border);
+    border-radius: 16px;
+    padding: 20px 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+    box-shadow: 0 4px 0 rgba(0,0,0,0.1);
+  }
+
+  .hero-card:hover { transform: translateY(-3px); box-shadow: 0 7px 16px rgba(0,0,0,0.15); border-color: var(--sky); }
+
+  .hero-card .icon { font-size: 44px; display: block; margin-bottom: 10px; }
+  .hero-card h3 { font-family: 'Fredoka One', cursive; font-size: 18px; margin-bottom: 4px; }
+  .hero-card p { font-size: 12px; color: var(--text-light); font-weight: 600; }
+
+  .notification {
+    background: #fff3cd;
+    border: 2px solid var(--gold);
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #856404;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* ===== TOAST ===== */
+  .toast {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: #333;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 700;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s;
+    z-index: 300;
+  }
+
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* Weekly progress mini bar */
+  .week-days { display: flex; gap: 4px; }
+  .day-dot {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    background: #eee;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text-light);
+  }
+  .day-dot.done { background: var(--green); border-color: var(--green-dark); color: #fff; }
+  .day-dot.today { border-color: var(--sky); background: #e8f5ff; }
+</style>
 </head>
 <body>
-    <div class="landing-page">
-        <div class="container">
-            <h1>🏠 FamPlan</h1>
-            <p>Make family chores fun with points, streaks, and badges!</p>
-            
-            <div class="role-selection">
-                <button class="btn btn-parent" onclick="goToParent()">
-                    👨‍👩‍👧‍👦 Parent Dashboard
-                </button>
-                <button class="btn btn-child" onclick="goToChild()">
-                    👶 Child Dashboard
-                </button>
-            </div>
-        </div>
+
+<!-- TOP NAV -->
+<div class="topbar">
+  <div class="logo">
+    <div class="logo-icon">🏠</div>
+    <div class="logo-text"><span class="fam">Fam</span><span class="plan">Plan</span></div>
+    <span style="font-size:20px; margin-left:4px;">⭐</span>
+  </div>
+  <div class="topbar-right">
+    <div class="user-badge" id="user-display">
+      <div class="user-avatar" id="user-avatar">👩</div>
+      <span id="user-name">Welcome, Sarah!</span>
+    </div>
+    <div class="xp-badge">🪙 <span id="xp-display">1,250</span> XP</div>
+  </div>
+</div>
+
+<!-- NAV TABS -->
+<div class="navtabs">
+  <button class="tab active" data-view="home" onclick="showView('home')">🏠 Home</button>
+  <button class="tab" data-view="chores" onclick="showView('chores')">📋 Chore List</button>
+  <button class="tab" data-view="rewards" onclick="showView('rewards')">🎁 Rewards</button>
+  <button class="tab" data-view="leaderboard" onclick="showView('leaderboard')">🏆 Leaderboard</button>
+</div>
+
+<!-- MAIN -->
+<main>
+
+  <!-- HOME VIEW -->
+  <div class="view active" id="view-home">
+    <div class="hero">
+      <h1>🌈 FamPlan</h1>
+      <p>Making Chores Fun &amp; Rewarding!</p>
     </div>
 
-    <script src="script.js"></script>
+    <!-- Notification for parent -->
+    <div class="notification" id="parent-notification">
+      ⚠️ Emma has claimed a task – tap <strong>Chore List</strong> to review it!
+    </div>
+
+    <div class="hero-cards">
+      <div class="hero-card" onclick="showView('chores')">
+        <span class="icon">📋</span>
+        <h3>Manage Chores</h3>
+        <p>Create, edit &amp; assign tasks</p>
+      </div>
+      <div class="hero-card" onclick="showView('rewards')">
+        <span class="icon">🎁</span>
+        <h3>Rewards</h3>
+        <p>Set goals &amp; prizes</p>
+      </div>
+      <div class="hero-card" onclick="showView('leaderboard')">
+        <span class="icon">🏆</span>
+        <h3>Leaderboard</h3>
+        <p>See who's winning!</p>
+      </div>
+    </div>
+
+    <!-- Leaderboard preview -->
+    <div class="wood-card">
+      <div class="card-title">⭐ Family Rankings</div>
+      <ul class="leaderboard-list">
+        <li class="lb-item">
+          <div class="lb-rank gold">1</div>
+          <div class="lb-avatar">👦</div>
+          <div><div class="lb-name">Oliver</div><div class="lb-level">Level 4</div></div>
+          <div class="lb-score">⭐ 1,350</div>
+        </li>
+        <li class="lb-item">
+          <div class="lb-rank silver">2</div>
+          <div class="lb-avatar">👧</div>
+          <div><div class="lb-name">Emma</div><div class="lb-level">Level 3</div></div>
+          <div class="lb-score">⭐ 1,250</div>
+        </li>
+        <li class="lb-item">
+          <div class="lb-rank bronze">3</div>
+          <div class="lb-avatar">🧒</div>
+          <div><div class="lb-name">Leo</div><div class="lb-level">Level 2</div></div>
+          <div class="lb-score">⭐ 950</div>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- CHORE LIST VIEW (Parent) -->
+  <div class="view" id="view-chores">
+    <div class="page-title">
+      <h1>Manage Chores</h1>
+      <p>✦ Create, Edit &amp; Assign Tasks ✦</p>
+    </div>
+
+    <!-- Parent manage panel -->
+    <div id="parent-chore-panel">
+      <div class="manage-grid">
+        <!-- Task Library -->
+        <div class="wood-card">
+          <div class="card-title">✦ Choose from Task Library ✦</div>
+          <button class="quick-add-btn" onclick="quickAddAll()">➕ Quick Add +</button>
+          <div class="task-library-grid">
+            <div class="library-item" onclick="selectLibraryTask('Clean Room','🛏️')"><span class="icon">🛏️</span>Clean Room</div>
+            <div class="library-item" onclick="selectLibraryTask('Do Homework','📚')"><span class="icon">📚</span>Do Homework</div>
+            <div class="library-item" onclick="selectLibraryTask('Wash Dishes','🍽️')"><span class="icon">🍽️</span>Wash Dishes</div>
+            <div class="library-item" onclick="selectLibraryTask('Take Out Trash','🗑️')"><span class="icon">🗑️</span>Take Out Trash</div>
+            <div class="library-item" onclick="selectLibraryTask('Cook Dinner','🍳')"><span class="icon">🍳</span>Cook Dinner</div>
+            <div class="library-item" onclick="selectLibraryTask('Feed the Pet','🐾')"><span class="icon">🐾</span>Feed the Pet</div>
+          </div>
+
+          <div class="card-title" style="margin-top:12px;">📝 Today's Task List</div>
+          <div id="today-tasks">
+            <div class="task-list-item"><div class="task-check">✓</div>Clean Your Room<div class="task-xp">⭐50 🪙</div></div>
+            <div class="task-list-item"><div class="task-check">✓</div>Do Homework<div class="task-xp">⭐50 🪙</div></div>
+            <div class="task-list-item"><div class="task-check">✓</div>Cook Dinner<div class="task-xp">⭐70 🪙</div></div>
+            <div class="task-list-item"><div class="task-check">✓</div>Feed the Pet<div class="task-xp">⭐70 🪙</div></div>
+          </div>
+        </div>
+
+        <!-- Create Custom Task -->
+        <div class="wood-card">
+          <div class="card-title">✦ Create Custom Task ✦</div>
+          <div class="form-group">
+            <label>Task Name:</label>
+            <input type="text" id="task-name" placeholder="Enter task name">
+          </div>
+          <div class="form-group">
+            <label>Description:</label>
+            <textarea id="task-desc" placeholder="Write a description..."></textarea>
+          </div>
+          <div class="form-group">
+            <label>Set Reward:</label>
+            <div class="reward-row">
+              <div class="reward-chip">🌟 <input type="number" value="50" min="10" max="200" style="width:50px; border:none; background:transparent; font-family:inherit; font-weight:800; font-size:13px;"> XP</div>
+              <div class="reward-chip">🪙 <input type="number" value="25" min="5" max="100" style="width:50px; border:none; background:transparent; font-family:inherit; font-weight:800; font-size:13px;"> Coins</div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Assign To:</label>
+            <div class="assign-avatars">
+              <button class="child-avatar-btn selected" title="Oliver" onclick="toggleAssign(this)">👦</button>
+              <button class="child-avatar-btn" title="Emma" onclick="toggleAssign(this)">👧</button>
+              <button class="child-avatar-btn" title="Leo" onclick="toggleAssign(this)">🧒</button>
+            </div>
+          </div>
+          <button class="btn-green" onclick="addTask()">✅ Add Task</button>
+          <div style="display:flex; gap:10px; margin-top:10px;">
+            <button class="btn-green" style="background: linear-gradient(180deg, #ff8c42, #e5631e);" onclick="showView('chores')">📌 Assign Tasks</button>
+            <button class="btn-green" style="background: linear-gradient(180deg, var(--sky), var(--sky-dark));" onclick="showToast('Calendar view coming soon!')">📅 View Calendar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Review claimed task -->
+      <div class="review-card">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+          <h3>🔍 Review Claimed Task</h3>
+          <span class="badge badge-orange">Pending Review</span>
+        </div>
+        <p style="font-size:14px; font-weight:700; color:var(--text-light);">Task: <strong>Clean Your Room</strong> — claimed by Emma (Level 3)</p>
+        <div class="review-photo">🛏️</div>
+        <p style="font-size:13px; color:var(--text-light); margin-bottom:8px;">Photo submitted as proof. Approve to reward Emma with ⭐50 XP + 🪙25 Coins.</p>
+        <div class="review-btns">
+          <button class="btn-approve" onclick="approveTask()">✅ Approve Task</button>
+          <button class="btn-cancel" onclick="cancelTask()">✖ Cancel Task</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHILD TASK VIEW (shown when child role active) -->
+  <div style="display:none" id="child-task-view">
+    <div class="page-title">
+      <h1>Complete Your Tasks!</h1>
+      <p>⭐ Earn Rewards &amp; Have Fun! ⭐</p>
+    </div>
+
+    <div class="stats-bar">
+      <div class="stat-chip">📋 Today's Tasks: <strong>5</strong></div>
+      <div class="stat-chip">⭐ This Week: <strong>8/12</strong></div>
+      <div class="stat-chip" style="flex:1; min-width:200px;">
+        🔺 XP to Level Up
+        <div class="xp-progress-bar">
+          <div class="xp-fill" id="xp-bar" style="width: 60%;"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="task-cards-grid" id="child-task-cards">
+      <!-- Cards injected by JS -->
+    </div>
+  </div>
+
+  <!-- REWARDS VIEW -->
+  <div class="view" id="view-rewards">
+    <div class="page-title">
+      <h1>Unlock Rewards!</h1>
+      <p>⭐ Reach Goals &amp; Collect Prizes! ⭐</p>
+    </div>
+
+    <div class="wood-card" style="margin-bottom:16px;">
+      <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+        <span style="font-size:14px; font-weight:700;">⭐ XP Progress:</span>
+        <div class="xp-progress-bar" style="flex:1; min-width:150px;">
+          <div class="xp-fill" style="width:50%;"></div>
+        </div>
+        <span style="font-size:14px; font-weight:800; color:var(--gold);">250 / 500 XP</span>
+      </div>
+      <p style="font-size:12px; font-weight:600; color:var(--text-light); text-align:center; margin-top:6px;">✦ Earn XP to unlock fun rewards! ✦</p>
+    </div>
+
+    <div class="rewards-grid">
+      <div class="reward-card unlocked">
+        <div class="reward-card-cost">⭐ 200 XP</div>
+        <div class="reward-card-img">🍫</div>
+        <div class="reward-card-body">
+          <div class="reward-card-name">Hanuta Treats!</div>
+          <div class="reward-card-desc">Collect 2 Hanuta Snacks!</div>
+          <button class="btn-green" style="font-size:13px; padding:8px;" onclick="claimReward(this,'Hanuta Treats')">✅ Claim!</button>
+        </div>
+      </div>
+      <div class="reward-card">
+        <div class="reward-card-cost">⭐ 500 XP</div>
+        <div class="reward-card-img">🎬</div>
+        <div class="reward-card-body">
+          <div class="reward-card-name">Movie Night!</div>
+          <div class="reward-card-desc">Enjoy a Family Movie!</div>
+          <button class="btn-green" style="font-size:13px; padding:8px; background: linear-gradient(180deg,#aaa,#888);" disabled>🔒 500 XP</button>
+        </div>
+      </div>
+      <div class="reward-card locked">
+        <div class="reward-card-cost">⭐ 1000 XP</div>
+        <div class="reward-card-img">🚗</div>
+        <div class="reward-card-body">
+          <div class="reward-card-name">New Toy!</div>
+          <div class="reward-card-desc">Get an RC Car Toy!</div>
+          <button class="btn-green" style="font-size:13px; padding:8px; background: linear-gradient(180deg,#aaa,#888);" disabled>🔒 1000 XP</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="ultimate-banner">
+      <div class="icon">🎡</div>
+      <div>
+        <h3>🏆 Ultimate Reward!</h3>
+        <p>⭐ 1500 XP — Theme Park Adventure!</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- LEADERBOARD VIEW -->
+  <div class="view" id="view-leaderboard">
+    <div class="page-title">
+      <h1>🏆 Leaderboard</h1>
+      <p>Who's the Chore Champion this week?</p>
+    </div>
+
+    <div class="wood-card" style="margin-bottom:16px;">
+      <div class="card-title">📅 Weekly Progress</div>
+      <div class="week-days" style="justify-content:center; margin-bottom:12px;">
+        <div class="day-dot done">M</div>
+        <div class="day-dot done">T</div>
+        <div class="day-dot done">W</div>
+        <div class="day-dot today">T</div>
+        <div class="day-dot">F</div>
+        <div class="day-dot">S</div>
+        <div class="day-dot">S</div>
+      </div>
+    </div>
+
+    <div class="wood-card">
+      <div class="card-title">⭐ All-Time Rankings</div>
+      <ul class="leaderboard-list">
+        <li class="lb-item" style="border-color: var(--gold); background: linear-gradient(135deg, #fffbec, #fff9e0);">
+          <div class="lb-rank gold">🥇</div>
+          <div class="lb-avatar">👦</div>
+          <div><div class="lb-name">Oliver</div><div class="lb-level">Level 4 · 28 tasks done</div></div>
+          <div class="lb-score">⭐ 1,350</div>
+        </li>
+        <li class="lb-item">
+          <div class="lb-rank silver">🥈</div>
+          <div class="lb-avatar">👧</div>
+          <div><div class="lb-name">Emma</div><div class="lb-level">Level 3 · 24 tasks done</div></div>
+          <div class="lb-score">⭐ 1,250</div>
+        </li>
+        <li class="lb-item">
+          <div class="lb-rank bronze">🥉</div>
+          <div class="lb-avatar">🧒</div>
+          <div><div class="lb-name">Leo</div><div class="lb-level">Level 2 · 18 tasks done</div></div>
+          <div class="lb-score">⭐ 950</div>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+</main>
+
+<!-- ROLE TOGGLE -->
+<div class="role-toggle">
+  <div style="font-size:11px; text-align:right; color:var(--text-light); font-weight:700;">Switch view:</div>
+  <button class="role-btn parent-btn active-role" onclick="setRole('parent')">👩 Parent View</button>
+  <button class="role-btn child-btn" onclick="setRole('child')">👧 Child View (Emma)</button>
+</div>
+
+<!-- COMPLETION POPUP -->
+<div class="popup-overlay" id="popup">
+  <div class="popup">
+    <div style="font-size:48px; margin-bottom:8px;">🎉</div>
+    <div class="popup-title">Task Complete!</div>
+    <p style="font-size:14px; color:var(--text-light); font-weight:600;">Great job! You earned:</p>
+    <div class="popup-rewards">
+      <div class="popup-reward-item">⭐ 50 XP</div>
+      <div class="popup-reward-item">🪙 25</div>
+    </div>
+    <div class="popup-btns">
+      <button class="btn-collect" onclick="closePopup()">🎁 Collect!</button>
+      <button class="btn-next" onclick="closePopup()">➡ Next Task</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+let role = 'parent';
+let xp = 1250;
+
+const childTasks = [
+  { name: 'Clean Your Room', icon: '🛏️', xp: 50, coins: 25, done: false },
+  { name: 'Do Homework', icon: '📚', xp: 50, coins: 25, done: true },
+  { name: 'Feed the Pet', icon: '🐾', xp: 70, coins: 30, done: true },
+  { name: 'Wash Dishes', icon: '🍽️', xp: 60, coins: 28, done: false },
+  { name: 'Take Out Trash', icon: '🗑️', xp: 40, coins: 20, done: false },
+];
+
+function renderChildTasks() {
+  const container = document.getElementById('child-task-cards');
+  container.innerHTML = childTasks.map((t, i) => `
+    <div class="task-card">
+      <div class="task-card-img" style="background: ${t.done ? 'linear-gradient(135deg,#d4f7de,#a0e8b4)' : 'linear-gradient(135deg,#c8e6ff,#a0d4f5)'}">
+        <span style="font-size:56px;">${t.icon}</span>
+        <div class="star-badge">⭐ ${t.xp}</div>
+      </div>
+      <div class="task-card-body">
+        <div class="task-card-name">${t.name}</div>
+        ${!t.done ? `<button class="btn-photo" onclick="showToast('📷 Camera would open here!')">📷 Take Photo</button>` : ''}
+        <button class="btn-done ${t.done ? 'completed' : ''}" onclick="markDone(${i})" ${t.done ? 'disabled' : ''}>
+          ${t.done ? '✅ Task Done!' : '✓ Mark Done'} <span style="margin-left:auto;">⭐${t.xp}</span>
+        </button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function markDone(i) {
+  childTasks[i].done = true;
+  renderChildTasks();
+  xp += childTasks[i].xp;
+  document.getElementById('xp-display').textContent = xp.toLocaleString();
+  document.getElementById('popup').classList.add('show');
+}
+
+function closePopup() {
+  document.getElementById('popup').classList.remove('show');
+}
+
+function showView(view) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('view-' + view).classList.add('active');
+  document.querySelector(`[data-view="${view}"]`).classList.add('active');
+
+  if (view === 'chores' && role === 'child') {
+    document.getElementById('parent-chore-panel').style.display = 'none';
+    document.getElementById('child-task-view').style.display = 'block';
+    renderChildTasks();
+  } else if (view === 'chores') {
+    document.getElementById('parent-chore-panel').style.display = 'block';
+    document.getElementById('child-task-view').style.display = 'none';
+  }
+}
+
+function setRole(r) {
+  role = r;
+  document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active-role'));
+  if (r === 'parent') {
+    document.querySelector('.parent-btn').classList.add('active-role');
+    document.getElementById('user-avatar').textContent = '👩';
+    document.getElementById('user-name').textContent = 'Welcome, Sarah!';
+    document.getElementById('parent-notification').style.display = 'flex';
+  } else {
+    document.querySelector('.child-btn').classList.add('active-role');
+    document.getElementById('user-avatar').textContent = '👧';
+    document.getElementById('user-name').textContent = 'Emma | Level 3';
+    document.getElementById('parent-notification').style.display = 'none';
+  }
+  // Refresh chore view if currently visible
+  const choreView = document.getElementById('view-chores');
+  if (choreView.classList.contains('active')) showView('chores');
+  showToast(r === 'parent' ? '👩 Switched to Parent view' : '👧 Switched to Emma\'s view');
+}
+
+function selectLibraryTask(name, icon) {
+  document.getElementById('task-name').value = name;
+  showToast(`${icon} "${name}" loaded into form!`);
+}
+
+function quickAddAll() {
+  showToast('✅ All library tasks added to today\'s list!');
+}
+
+function toggleAssign(btn) {
+  btn.classList.toggle('selected');
+}
+
+function addTask() {
+  const name = document.getElementById('task-name').value.trim();
+  if (!name) { showToast('⚠️ Please enter a task name!'); return; }
+  const list = document.getElementById('today-tasks');
+  const item = document.createElement('div');
+  item.className = 'task-list-item';
+  item.innerHTML = `<div class="task-check" style="background:var(--sky)">+</div>${name}<div class="task-xp">⭐50 🪙</div>`;
+  list.appendChild(item);
+  document.getElementById('task-name').value = '';
+  document.getElementById('task-desc').value = '';
+  showToast(`✅ "${name}" added!`);
+}
+
+function approveTask() {
+  showToast('✅ Task approved! Emma earned ⭐50 XP + 🪙25 Coins');
+}
+
+function cancelTask() {
+  showToast('✖ Task cancelled. Emma will be notified.');
+}
+
+function claimReward(btn, name) {
+  btn.textContent = '🎉 Claimed!';
+  btn.disabled = true;
+  btn.style.background = 'linear-gradient(180deg, #aaa, #888)';
+  showToast(`🎁 "${name}" reward claimed!`);
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+</script>
 </body>
 </html>
